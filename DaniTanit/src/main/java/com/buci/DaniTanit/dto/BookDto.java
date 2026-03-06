@@ -2,6 +2,8 @@ package com.buci.DaniTanit.dto;
 
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class BookDto {
     private Long id;
@@ -11,5 +13,7 @@ public class BookDto {
     private Integer publishYear;
 
     private Long authorId;
+
+    private List<Long> genreIds;
 }
 

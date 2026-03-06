@@ -8,8 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -20,12 +18,15 @@ public class BookService {
 
     public List<BookDto> findAll() {
         List<Book> books = bookRepository.findAll();
-        return books.stream().map((book) -> bookConverter.toDto(book)).collect(Collectors.toList());
+        return books.stream()
+            .map(bookConverter::toDto)
+            .collect(Collectors.toList());
     }
 
     public BookDto findById(Long id) {
-        Optional<Book> book = bookRepository.findById(id);
-        return this.bookConverter.toDto(book.get());
+        Book book = bookRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Book not found with id: " + id));
+        return bookConverter.toDto(book);
     }
 
     public Long create(BookDto book) {
@@ -33,12 +34,53 @@ public class BookService {
     }
 
     public void delete(Long id) {
-
+        // Ellenőrizzük, hogy létezik-e a könyv törlés előtt
+        if (!bookRepository.existsById(id)) {
+            throw new RuntimeException("Book not found with id: " + id);
+        }
         bookRepository.deleteById(id);
     }
 
-    public BookDto update(BookDto book) {
-        Book modified = bookRepository.save(this.bookConverter.toEntity(book));
-        return bookConverter.toDto(modified);
+    public BookDto update(BookDto bookDto) {
+        // Ellenőrizzük, hogy létezik-e a könyv
+        Book existingBook = bookRepository.findById(bookDto.getId())
+            .orElseThrow(() -> new RuntimeException("Book not found with id: " + bookDto.getId()));
+        
+        // Módosítjuk a meglévő könyv adatait (így megtartjuk a createdAt-ot)
+        existingBook.setName(bookDto.getName());
+        existingBook.setPublishYear(bookDto.getPublishYear());
+        
+        // Author frissítése
+        if (bookDto.getAuthorId() != null) {
+            existingBook.setAuthor(
+                bookConverter.toEntity(bookDto).getAuthor()
+            );
+        }
+        
+        // Genre-k frissítése
+        if (bookDto.getGenreIds() != null) {
+            existingBook.setGenres(
+                bookConverter.toEntity(bookDto).getGenres()
+            );
+        }
+        
+        Book savedBook = bookRepository.save(existingBook);
+        return bookConverter.toDto(savedBook);
+    }
+    
+    // Könyvek keresése szerző neve alapján (betűvel kezdődik)
+    public List<BookDto> findBooksByAuthorNameStartingWith(String prefix) {
+        List<Book> books = bookRepository.findByAuthorNameStartingWith(prefix);
+        return books.stream()
+            .map(bookConverter::toDto)
+            .collect(Collectors.toList());
+    }
+    
+    // Konkrétan 'V' betűvel kezdődő szerzők könyvei
+    public List<BookDto> findBooksWithAuthorNameStartingWithV() {
+        List<Book> books = bookRepository.findBooksWithAuthorNameStartingWithV();
+        return books.stream()
+            .map(bookConverter::toDto)
+            .collect(Collectors.toList());
     }
 }

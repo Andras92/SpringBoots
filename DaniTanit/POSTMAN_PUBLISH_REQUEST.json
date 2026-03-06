@@ -1,0 +1,64 @@
+{
+  "info": {
+    "name": "Publish Create Example",
+    "description": "Request body példa a Publish létrehozásához"
+  },
+  "examples": [
+    {
+      "name": "Automatikus dátummal (ajánlott)",
+      "description": "A publishDate automatikusan beállítódik az aktuális időpontra",
+      "url": "POST http://localhost:8080/rest/publish/create",
+      "body": {
+        "bookId": 1,
+        "authorId": 1
+      },
+      "note": "Csak a kötelező mezők - a dátum automatikusan generálódik!"
+    },
+    {
+      "name": "Saját dátummal",
+      "description": "Megadhatod a saját publikálási dátumod",
+      "url": "POST http://localhost:8080/rest/publish/create",
+      "body": {
+        "bookId": 1,
+        "authorId": 1,
+        "publishDate": "2024-03-15T10:30:00"
+      },
+      "note": "A publishDate formátum: yyyy-MM-ddTHH:mm:ss"
+    },
+    {
+      "name": "Másik példa több könyvvel",
+      "url": "POST http://localhost:8080/rest/publish/create",
+      "body": {
+        "bookId": 2,
+        "authorId": 1
+      }
+    }
+  ],
+  "prerequisites": {
+    "step1": {
+      "description": "Először hozz létre egy Author-t",
+      "url": "POST http://localhost:8080/rest/author/create",
+      "body": {
+        "name": "J.R.R. Tolkien"
+      }
+    },
+    "step2": {
+      "description": "Majd hozz létre egy Book-ot",
+      "url": "POST http://localhost:8080/rest/book/create",
+      "body": {
+        "name": "The Hobbit",
+        "publishYear": 1937,
+        "authorId": 1,
+        "genreIds": []
+      }
+    },
+    "step3": {
+      "description": "Most már létrehozhatod a Publish-t",
+      "url": "POST http://localhost:8080/rest/publish/create",
+      "body": {
+        "bookId": 1,
+        "authorId": 1
+      }
+    }
+  }
+}

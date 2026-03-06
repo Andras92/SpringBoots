@@ -44,4 +44,20 @@ public class BookController {
     public ResponseEntity<BookDto> update(@RequestBody BookDto book) {
         return new ResponseEntity<>(bookService.update(book), HttpStatus.OK);
     }
+    
+    // Könyvek keresése szerző neve alapján (paraméterrel)
+    // Példa: GET /rest/book/search/by-author?prefix=V
+    @GetMapping("/search/by-author")
+    public ResponseEntity<List<BookDto>> findByAuthorNameStartingWith(@RequestParam String prefix) {
+        List<BookDto> books = bookService.findBooksByAuthorNameStartingWith(prefix);
+        return ResponseEntity.ok(books);
+    }
+    
+    // Konkrétan 'V' betűvel kezdődő szerzők könyvei
+    // Példa: GET /rest/book/search/author-starts-with-v
+    @GetMapping("/search/author-starts-with-v")
+    public ResponseEntity<List<BookDto>> findBooksWithAuthorNameStartingWithV() {
+        List<BookDto> books = bookService.findBooksWithAuthorNameStartingWithV();
+        return ResponseEntity.ok(books);
+    }
 }

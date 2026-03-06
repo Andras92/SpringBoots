@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Builder
 @NoArgsConstructor
@@ -30,11 +31,20 @@ public class Book {
     @JoinColumn(name = "author_id")
     private Author author;
 
+    @Column(name = "modified_at")
+    private LocalDateTime modifiedAt = modifiedTimer();
+
     @Column(name = "created_at")
     private LocalDateTime createdAt = createTimer();
 
-    @Column(name = "modified_at")
-    private LocalDateTime modifiedAt = modifiedTimer();
+
+    @ManyToMany(fetch= FetchType.LAZY)
+    @JoinTable(
+            name = "book_genres",
+            joinColumns = @JoinColumn(name = "book_id"),
+            inverseJoinColumns = @JoinColumn(name = "genre_id")
+    )
+    private List<Genre> genres;
 
     private LocalDateTime createTimer() {
         if (this.createdAt == null) {
@@ -44,14 +54,10 @@ public class Book {
     }
 
     private LocalDateTime modifiedTimer() {
-        if (createdAt != null) {
-            return LocalDateTime.now();
-        } else {
+        if (createdAt == null) {
             return null;
+        } else {
+            return LocalDateTime.now();
         }
     }
 }
-
-// modifiedAt logika megcsinálása
-// Genre entity létrehozása
-// publikálás entitás amihez kapcsolódik author és book is ahol automatikusan setteljek be egy dátumot

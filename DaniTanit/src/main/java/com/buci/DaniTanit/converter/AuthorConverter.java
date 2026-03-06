@@ -11,7 +11,6 @@ import java.util.ArrayList;
 @Component
 @RequiredArgsConstructor
 public class AuthorConverter {
-    private final BookRepository bookRepository;
 
     public AuthorDto toDto(Author entity) {
         AuthorDto dto = new AuthorDto();
